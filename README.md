@@ -2,6 +2,8 @@
 
 **A completed historical study, explained in plain language.** This repository contains the experiment code and a summary of what happened in the final historical test. It does not contain the market dataset, trained models or detailed numerical result files.
 
+**Start here:** Read sections 1–6 for the question and method, section 7 for the actual results, and the [illustrated results guide](results/README.md) for all nine charts with explanations. The figures and tables are readable on GitHub; the disabled dashboard and the private study website are not needed to understand the findings.
+
 This is a research project, not financial advice and not a live trading system. Nothing here recommends buying or selling anything.
 
 ## 1. The question
@@ -113,6 +115,11 @@ It does not contain:
 ### What the final historical test showed
 
 The final TEST period ran from **30 August 2021 to 4 February 2026**. These are observations from that one past period, not forecasts or evidence that an agent would make money in live trading. The tables below present the historical results in a readable form; the separate dashboard remains disabled.
+
+![Final historical TEST total returns for the four PPO designs, buy-and-hold, always CASH and five random references](results/figures/final-test-returns.svg)
+
+The bars show total return over the whole final TEST period, after modelled trading costs—not a yearly return. E4 had the highest mean, but its five separate training starts varied substantially. The [illustrated results guide](results/README.md) explains this graph and eight further figures, including risk, seed sensitivity, the VALIDATION-to-TEST ranking reversal and the research-question comparisons.
+
 #### Numbers from the final historical TEST
 
 The table below summarizes the frozen final assessment: 1,618 daily decision steps from 30 August 2021 to 4 February 2026. Each E1–E4 value is the average of five separately trained agents tested on the **same** historical market path. “±” is the population standard deviation across those five training starts; it is not a confidence interval. Buy-and-hold is one fixed comparison strategy, not a five-run average.
@@ -173,6 +180,10 @@ The same TEST path was also evaluated with strategies that do not learn. **Alway
 The random strategies traded hundreds of times and suffered substantial cost drag. Beating random decisions is a low bar; buy-and-hold is the more informative comparison here. Always CASH has no varying daily return, so its Sharpe ratio is undefined rather than zero.
 
 #### Results from all five training starts
+
+![Five individual training-start returns for each design on the final TEST; the white tick is the mean](results/figures/test-return-by-seed.svg)
+
+Each dot is a trained agent with a different random start, evaluated on the **same** historical market path. The figure exposes how much the five outcomes vary; it is not five independent market tests.
 
 The seed is simply the number that starts a training run. All seeds were trained on the same TRAIN period and assessed on the same later market path. The following are **total returns after modelled trading costs**, not annual returns. They show why an average must not be mistaken for a result every run achieved.
 
@@ -243,6 +254,8 @@ The effect of reward R2 changed with the observation and the evaluation period. 
 **Practical conclusion:** In this controlled historical study, the richer observation was more useful than the minimal one, especially because it reduced trading and modelled cost exposure. The evidence does **not** establish a reliable profitable daily investment strategy, performance in other markets or periods, or a statistically significant advantage.
 
 The readable results above are in this README. The machine-readable evidence files, market dataset and day-by-day replay are not included in this repository. The dashboard is currently disabled and displays no results.
+
+For all nine static graphs and their plain-language interpretations, see the [illustrated results guide](results/README.md). It also states what the charts cannot establish.
 
 ## 8. Principal limitations
 
