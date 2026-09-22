@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PPO Sequential Trading Study — evidence dashboard</title>
+<meta name="description" content="Read-only dashboard for a controlled PPO study of state representation and reward design. Renders only a verified evidence package; shows no result while none is installed. Research use only.">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<a class="skip" href="#overview">Skip to content</a>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="title-block">
+      <h1 id="study-title">PPO Sequential Trading Study</h1>
+      <div class="subtitle-strong">Controlled PPO study: state representation × reward design</div>
+      <div class="subtitle-small">Descriptive, non-inferential — not financial advice · research use only</div>
+    </div>
+    <div class="header-right">
+      <span class="badge" id="package-badge" title="Status of the evidence package under dashboard/data/">NO EVIDENCE PACKAGE INSTALLED</span>
+      <button id="presentation-toggle" class="btn btn-ghost" type="button" title="Presentation mode: hides controls, enlarges fonts (URL ?presentation=1)">Presentation mode</button>
+    </div>
+  </div>
+  <nav class="site-nav" aria-label="Sections">
+    <a href="#overview">Overview</a>
+    <a href="#limitations">Limitations</a>
+    <a href="#matrix">Matrix</a>
+    <a href="#baselines">Baselines</a>
+    <a href="#perseed">Per seed</a>
+    <a href="#valtest">VALIDATION vs TEST</a>
+    <a href="#claims">Claims</a>
+    <a href="#provenance">Provenance</a>
+  </nav>
+</header>
+
+<main id="main">
+<div id="no-package" class="notice">
+  <b>No evidence package installed.</b> This page renders only a reviewed evidence package placed under <code>dashboard/data/</code> by the deterministic producer of the Research Evidence Contract. None is present, so no result value, chart or table is shown. This repository is a code-only candidate awaiting the scientific-evidence and publication gates.
+</div>
+<div id="load-error" class="notice error" hidden></div>
+
+<!-- ================================================================ OVERVIEW (explanatory presentation; design facts only, no result) -->
+<section id="overview" class="section">
+  <div class="section-head"><h2>Overview — a sequential financial decision problem <span class="badge" data-panel-label="explanatory"></span></h2>
+    <p class="lead">An agent observes a market state each day and chooses a <b>target exposure state</b>: <span class="state cash">CASH</span> (no exposure to the traded asset) or <span class="state inv">INVESTED</span> (full exposure). Only a change of state is a transaction: <span class="state cash">CASH</span> → <span class="state inv">INVESTED</span> is a <b>BUY</b>, <span class="state inv">INVESTED</span> → <span class="state cash">CASH</span> is a <b>SELL</b>. Staying <span class="state inv">INVESTED</span> is not a repeated BUY. Each purchase or sale has a modelled 0.10% trading fee plus a 0.05% allowance for slippage, totaling 0.15% of the traded value. Slippage is the difference between the reference price and the execution price; the allowance models that difference. These assumptions are not guaranteed real-world costs. Proximal Policy Optimization (PPO) learns the policy on a TRAIN window; a VALIDATION window fixed every design choice; a prospectively untouched TEST window was evaluated exactly once.</p>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <h3>The 2 × 2 experimental matrix</h3>
+      <table class="matrix2x2">
+        <thead><tr><th></th><th><span class="tag">R1</span> financial reward</th><th><span class="tag">R2</span> risk-shaped reward</th></tr></thead>
+        <tbody>
+          <tr><th><span class="tag">O1</span> minimal state</th><td class="cell E1"><b>E1</b><br>O1 + R1<br><small>control</small></td><td class="cell E3"><b>E3</b><br>O1 + R2<br><small>RQ3 treatment</small></td></tr>
+          <tr><th><span class="tag">O2</span> engineered state</th><td class="cell E2"><b>E2</b><br>O2 + R1<br><small>RQ2 treatment</small></td><td class="cell E4"><b>E4</b><br>O2 + R2<br><small>RQ1 main configuration</small></td></tr>
+        </tbody>
+      </table>
+      <dl class="defs">
+        <dt>O1</dt><dd>minimal state representation: the recent daily log-return history plus the current exposure state.</dd>
+        <dt>O2</dt><dd>engineered causal market-state representation: eight close-derived features (returns over several horizons, realised volatility, moving-average ratios, RSI) plus the current exposure state; scaled with TRAIN-only statistics.</dd>
+        <dt>R1</dt><dd>financial portfolio log return per step after transaction costs.</dd>
+        <dt>R2</dt><dd>R1 minus a turnover penalty (0.0005 per transaction leg) minus an incremental-drawdown penalty (0.10 × increase in drawdown). Reward shaping only; the financial accounting is identical in all four experiments.</dd>
+      </dl>
+    </div>
+    <div class="card">
+      <h3>Fixed design</h3>
+      <ul class="facts" id="overview-facts"><li class="hint">Design facts are shown from the verified evidence package.</li></ul>
+      <h3 class="mt">Research questions</h3>
+      <ol class="rq-list">
+        <li><b>RQ1</b> Can an RL agent learn a risk-aware policy from historical market observations? <em>(E4 vs baselines)</em></li>
+        <li><b>RQ2</b> Does an engineered state representation change out-of-sample behaviour relative to a minimal representation? <em>(E2 vs E1, E4 vs E3)</em></li>
+        <li><b>RQ3</b> Do explicit turnover and drawdown penalties produce more stable behaviour than a purely financial reward? <em>(E3 vs E1, E4 vs E2)</em></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ LIMITATIONS (first screen; text from the verified claims payload) -->
+<section id="limitations" class="section">
+  <div class="section-head"><h2>Limitations <span class="badge" data-panel-label="explanatory"></span></h2></div>
+  <div class="card"><ul class="bullets two-col" id="limitations-list"><li class="hint">Shown from the verified claims payload.</li></ul></div>
+</section>
+
+<!-- ================================================================ MATRIX (frozen evidence, restated) -->
+<section id="matrix" class="section" data-requires="EC-7a">
+  <div class="section-head"><h2>Per-configuration matrix <span class="badge" data-panel-label="frozen"></span></h2>
+    <p class="lead">Mean ± population standard deviation over the training-seed cohort, per split. Values are fractions, not percentages. The ± is seed dispersion on one shared market path, not inferential uncertainty.</p>
+  </div>
+  <div class="card"><h3>TEST</h3><table class="results" id="matrix-TEST"></table></div>
+  <div class="card mt"><h3>VALIDATION</h3><table class="results" id="matrix-VALIDATION"></table></div>
+  <p class="footnote">Cost is the compounded cost-factor drag <code>1 − 0.9985<sup>legs</sup></code> for the fixed position path, not fees as a fraction of initial equity. Sharpe: annualised with 365 periods per year.</p>
+</section>
+
+<!-- ================================================================ BASELINES -->
+<section id="baselines" class="section" data-requires="EC-7c">
+  <div class="section-head"><h2>Baselines <span class="badge" data-panel-label="frozen"></span></h2>
+    <p class="lead">Non-learned baselines evaluated through the identical environment and accounting: always <span class="state cash">CASH</span>, BUY_AND_HOLD (always <span class="state inv">INVESTED</span>, one leg) and seeded random policies. The random policies are streams on the same market path, not independent market samples.</p>
+  </div>
+  <div class="card"><h3>TEST</h3><table class="results" id="baselines-TEST"></table></div>
+  <div class="card mt"><h3>VALIDATION</h3><table class="results" id="baselines-VALIDATION"></table></div>
+</section>
+
+<!-- ================================================================ PER SEED -->
+<section id="perseed" class="section" data-requires="EC-7b">
+  <div class="section-head"><h2>Per-seed results <span class="badge" data-panel-label="frozen"></span></h2>
+    <p class="lead">One row per configuration and training seed. Shown only when the per-seed payload is included in the package.</p>
+  </div>
+  <div class="card"><h3>TEST</h3><table class="results" id="perseed-TEST"></table></div>
+  <div class="card mt"><h3>VALIDATION</h3><table class="results" id="perseed-VALIDATION"></table></div>
+</section>
+
+<!-- ================================================================ VALIDATION vs TEST -->
+<section id="valtest" class="section" data-requires="EC-7d">
+  <div class="section-head"><h2>VALIDATION vs TEST <span class="badge" data-panel-label="frozen"></span></h2>
+    <p class="lead" id="valtest-note">Ranking of the configurations by mean total return on each split, restated from the frozen aggregate tables.</p>
+  </div>
+  <div class="card"><table class="results" id="ranking-table"></table></div>
+  <div class="card mt" id="rq1-card"><h3>RQ1 counts on TEST <span class="badge" data-panel-label="explanatory"></span></h3><div id="rq1-box"></div></div>
+</section>
+
+<!-- ================================================================ CLAIMS -->
+<section id="claims" class="section">
+  <div class="section-head"><h2>Claims and their strength <span class="badge" data-panel-label="explanatory"></span></h2>
+    <p class="lead">Every claim is shown with its strength label. Wording comes verbatim from the verified claims payload; nothing here is composed by this page.</p>
+  </div>
+  <div class="grid-2" id="claims-box"></div>
+</section>
+
+<!-- ================================================================ PROVENANCE -->
+<section id="provenance" class="section">
+  <div class="section-head"><h2>Provenance <span class="badge" data-panel-label="explanatory"></span></h2></div>
+  <div class="grid-2">
+    <div class="card"><table class="kv" id="prov-table"></table></div>
+    <div class="card">
+      <h3>What this page verifies</h3>
+      <ul class="bullets" id="notices-list"></ul>
+      <h3 class="mt">Terminology note</h3>
+      <p>Public wording on this page: state 0 = <span class="state cash">CASH</span>, state 1 = <span class="state inv">INVESTED</span> (full exposure to the traded asset). The frozen evidence files and the code keep an internal label for state 1 (<code id="internal-label">—</code>); historical records are not rewritten.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  Read-only presentation of frozen evidence · research use only · descriptive, non-inferential — not financial advice.
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

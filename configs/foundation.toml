@@ -1,0 +1,39 @@
+# Foundation configuration.
+# Every value here mirrors docs/methodology.md.
+# Changing a frozen value requires an amendment entry in the frozen study design (docs/methodology.md) change log.
+
+[dataset]
+# Path relative to the repository root. The file is NOT tracked in git (*.csv is ignored);
+# the SHA-256 below is the reproducibility anchor for the restored file.
+raw_csv = "data/raw/btc-usdt-daily-raw-v4.csv"
+expected_sha256 = "7ff14ebd8f2236eb733073cbea7bfd36d2e1c6977aff89e00bdfde74f3af1305"
+hard_cutoff = "2026-04-29"          # last usable candle (by candle date, never by wall clock)
+expected_first_date = "2017-08-17"  # first candle in the restored file
+expected_last_date = "2026-04-29"   # last retained candle after the cutoff
+expected_rows_after_cutoff = 3178
+# Identity (sha256, first/last date, row count) is verified on every load.  All four values
+# must equal the frozen constants in src/btc_rl/data.py; load_foundation_config rejects mismatches.
+
+[splits]
+# Windows are DECISION dates: the dates on which the observation is formed (after close[t]).
+train = ["2018-03-04", "2020-12-31"]
+validation = ["2021-01-01", "2021-08-29"]
+test = ["2021-08-30", "2026-02-04"]
+
+[costs.conservative]
+fee_bps = 10.0
+slippage_bps = 5.0
+spread_bps = 0.0
+
+[costs.zero]
+fee_bps = 0.0
+slippage_bps = 0.0
+spread_bps = 0.0
+
+[observation]
+lookback = 10          # number of daily log returns in O1
+return_scale = 1.0     # divisor applied to log returns (1.0 = raw)
+
+[accounting]
+periods_per_year = 365
+initial_equity = 1.0
