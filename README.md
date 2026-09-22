@@ -1,4 +1,4 @@
-# PPO Sequential Trading Study
+# Reinforcement Learning for Sequential Trading Decisions: A Controlled PPO Study on State Representation and Reward Design
 
 **A completed historical study, explained in plain language.** This repository contains the experiment code and a summary of what happened in the final historical test. It does not contain the market dataset, trained models or detailed numerical result files.
 
