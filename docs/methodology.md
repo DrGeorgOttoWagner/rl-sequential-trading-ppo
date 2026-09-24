@@ -5,7 +5,7 @@ This document describes the final frozen study design. Choices were frozen befor
 ## Data
 
 - One asset and one historical daily spot-market dataset: Bitcoin priced in the US-dollar stablecoin Tether (BTC/USDT). Each daily record holds the opening, highest, lowest and closing price and the traded volume (OHLCV). No exchange, product or asset is recommended.
-- The dataset is identified by its SHA-256 (`configs/foundation.toml`, `[dataset].expected_sha256`), first date 2017-08-17, last retained date 2026-04-29 and 3178 rows after the cutoff. The file is **not distributed** with this repository (`reproduction-boundary.md`).
+- The exact dataset is included at `data/raw/btc-usdt-daily-raw-v4.csv`. It is identified by its SHA-256 (`configs/foundation.toml`, `[dataset].expected_sha256`), first date 2017-08-17, last retained date 2026-04-29 and 3178 rows after the cutoff.
 - Hard cutoff by candle date (last usable candle 2026-04-29); no wall-clock logic; no fetching; no silent repair. Any integrity violation raises `DataIntegrityError`.
 - Timestamps must be exact UTC midnight with exact 24-hour spacing; the checks run on the raw millisecond epoch before any normalisation.
 

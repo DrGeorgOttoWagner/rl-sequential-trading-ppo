@@ -13,9 +13,9 @@ def cfg():
 
 @pytest.fixture(scope="session")
 def frame(cfg):
-    # Real-data fixture: the restricted dataset is not distributed; tests that need it skip.
+    # Real-data fixture: the dataset ships with the repository; skip only if the checkout is incomplete.
     if not cfg.dataset.raw_csv.exists():
-        pytest.skip("restricted dataset not distributed; see docs/reproduction-boundary.md")
+        pytest.skip("dataset file is missing; restore the complete repository checkout")
     df, _ = load_dataset(cfg.dataset)
     return df
 

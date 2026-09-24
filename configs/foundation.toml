@@ -3,8 +3,8 @@
 # Changing a frozen value requires an amendment entry in the frozen study design (docs/methodology.md) change log.
 
 [dataset]
-# Path relative to the repository root. The file is NOT tracked in git (*.csv is ignored);
-# the SHA-256 below is the reproducibility anchor for the restored file.
+# Path relative to the repository root. The exact file is tracked for reproducibility;
+# the SHA-256 below is its byte-level identity anchor.
 raw_csv = "data/raw/btc-usdt-daily-raw-v4.csv"
 expected_sha256 = "7ff14ebd8f2236eb733073cbea7bfd36d2e1c6977aff89e00bdfde74f3af1305"
 hard_cutoff = "2026-04-29"          # last usable candle (by candle date, never by wall clock)

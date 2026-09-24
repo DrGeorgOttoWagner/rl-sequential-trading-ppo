@@ -6,34 +6,35 @@ ppo-sequential-trading-study/
   PUBLICATION-STATUS.md        private, unpublished candidate; gates pending
   pyproject.toml, uv.lock, .python-version   locked dependency closure (CPU-only PyTorch wheels)
   configs/foundation.toml      frozen parameters: dataset identity, splits, costs, observation, accounting
+  data/raw/                    exact frozen historical dataset used by the study
   src/btc_rl/                  experiment source (see module map)
-  tests/                       tests that run without restricted data (dataset tests skip)
+  tests/                       complete synthetic and real-data integrity tests
   dashboard/                   read-only evidence dashboard (index.html, css/, js/); data/ is empty until a package is installed
   docs/                        methodology, evidence provenance, limitations, reproduction boundary, dashboard, architecture
 ```
 
-Absent by design: `data/` (dataset not distributed), `artifacts/` (checkpoints, curves, logs withheld), `results/`, `provenance/`, `figures/` and `dashboard/data/` (created only by an evidence package).
+Absent by design: `artifacts/` (original checkpoints, curves and logs withheld), `provenance/` and `dashboard/data/` (created only by an evidence package). `results/` contains static explanatory figures; `data/raw/` contains the exact study input.
 
 ## Module map (`src/btc_rl/`)
 
 | Module | Role | Runs inside this boundary? |
 |---|---|---|
-| `data.py` | raw CSV loading, hard cutoff, integrity validation, pinned identity | needs the dataset |
+| `data.py` | raw CSV loading, hard cutoff, integrity validation, pinned identity | yes; dataset included |
 | `splits.py` | frozen TRAIN / VALIDATION / TEST decision windows, purge rule | yes |
 | `costs.py` | cost configuration and per-leg factors | yes |
 | `observations.py` | O1 minimal observation | yes |
 | `observations_o2.py` | O2 engineered observation | yes |
-| `scaling.py` | TRAIN-only fit of the O1 return scale | needs the dataset |
+| `scaling.py` | TRAIN-only fit of the O1 return scale | yes; dataset included |
 | `env.py` | Gymnasium environment: timing contract, open-to-open accounting | yes (synthetic frames) |
 | `reference.py` | independent vectorised accounting used by the tests | yes |
 | `evaluation.py` | episode runner and metrics (365 periods per year) | yes |
 | `policies.py` | deterministic baselines; replay helper (input not distributed) | baselines yes; replay no |
-| `baselines.py` | command-line baseline run (`include_replay=False` inside this boundary) | needs the dataset |
+| `baselines.py` | command-line baseline run (`include_replay=False` inside this boundary) | yes; dataset included |
 | `reward_r2.py` | R2 risk-aware reward mixin with frozen coefficients | yes |
 | `config.py` | TOML loader with consistency checks against the frozen constants | yes |
-| `preflight.py` | environment / lock / source certification gate | needs the dataset |
+| `preflight.py` | original environment / lock / source certification gate | partial only; private replay input withheld |
 | `_pytest_certify.py` | pytest plugin used by the certification gate | yes |
-| `ppo_e1.py` … `ppo_e4.py` | experiment runners: PPO hyperparameters, split enforcement, metadata | no: dataset and private artifacts |
+| `ppo_e1.py` … `ppo_e4.py` | experiment runners: PPO hyperparameters, split enforcement, metadata | yes for new runs; use the README public-rerun procedure |
 | `ppo_e1_report.py` … `ppo_e4_report.py` | VALIDATION report builders | no: private artifacts |
 | `final_cohort.py`, `final_cohort_report.py` | five-seed cohort harness and reports | no: private artifacts |
 | `final_test.py`, `final_test_report.py` | human-gated one-time TEST harness and report builder | no: private artifacts; TEST is consumed |
@@ -44,10 +45,10 @@ Every command-line module is guarded by `if __name__ == "__main__":`; importing 
 
 | Command | Requirement |
 |---|---|
-| `uv run pytest -q` | none (dataset tests skip) |
-| `uv run python -m btc_rl.baselines --split validation` | restored dataset |
-| `uv run python -m btc_rl.preflight` | restored dataset |
-| `uv run python -m btc_rl.ppo_e1 …` and the other runners | restored dataset; outputs are new outputs, not frozen evidence |
+| `uv run pytest -q` | complete tests, including the included dataset |
+| `uv run python -m btc_rl.baselines --split validation --no-replay` | included dataset |
+| `uv run python -m btc_rl.preflight --skip-replay` | partial diagnostic only; the original replay input is withheld |
+| `uv run python -m btc_rl.ppo_e1 --seed 42 --smoke --skip-preflight` and the other runners | included dataset; outputs are new outputs, not frozen evidence |
 | `cd dashboard && python -m http.server 8080` | none; shows *No evidence package installed* |
 
 ## Evidence flow

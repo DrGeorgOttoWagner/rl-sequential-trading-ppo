@@ -5,6 +5,10 @@ __pycache__/
 *.egg-info/
 *.pyc
 
-# Restricted inputs are never distributed with this repository
-data/
+# The exact frozen study dataset is distributed for reproducibility.
+# Keep every other local data file out of Git.
+data/*
+!data/raw/
+data/raw/*
+!data/raw/btc-usdt-daily-raw-v4.csv
 artifacts/

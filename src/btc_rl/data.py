@@ -33,7 +33,7 @@ import pandas as pd
 from .observations import MAX_ABS_LOG_RETURN
 
 # data.py(0=btc_rl) -> 1 src -> 2 <project root>
-# the raw dataset is expected under data/raw/ (not distributed)
+# the exact raw dataset is included under data/raw/
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_RAW_CSV_RELATIVE = (
     "data/raw/btc-usdt-daily-raw-v4.csv"

@@ -17,7 +17,7 @@ from conftest import make_synthetic_frame
 from btc_rl.config import load_foundation_config as _load_cfg
 
 if not _load_cfg().dataset.raw_csv.exists():
-    pytest.skip("restricted dataset not distributed; see docs/reproduction-boundary.md", allow_module_level=True)
+    pytest.skip("dataset file is missing; restore the complete repository checkout", allow_module_level=True)
 
 
 def test_raw_file_unchanged(cfg):

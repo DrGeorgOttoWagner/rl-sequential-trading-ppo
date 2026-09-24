@@ -1,8 +1,8 @@
 # Reinforcement Learning for Sequential Trading Decisions: A Controlled PPO Study on State Representation and Reward Design
 
-**A completed historical study, explained in plain language.** This repository contains the experiment code and a summary of what happened in the final historical test. It does not contain the market dataset, trained models or detailed numerical result files.
+**A completed historical study, explained in plain language.** This repository contains the experiment code, the exact historical dataset used by the code, a summary of what happened in the final historical test, and the aggregate and per-training-start numerical reports behind the published tables. It does not contain trained models, training logs or day-by-day agent replay files.
 
-**Start here:** Read sections 1–6 for the question and method, section 7 for the actual results, and the [illustrated results guide](results/README.md) for all nine charts with explanations. The figures and tables are readable on GitHub; the disabled dashboard and the private study website are not needed to understand the findings.
+**Start here:** Read sections 1–6 for the question and method, section 7 for the actual results, and the [illustrated results guide](results/README.md) for all nine charts with explanations. The underlying VALIDATION and TEST summary reports are available under [`results/data/`](results/data/). The figures and tables are readable on GitHub; the disabled dashboard and the private study website are not needed to understand the findings.
 
 This is a research project, not financial advice and not a live trading system. Nothing here recommends buying or selling anything.
 
@@ -99,16 +99,17 @@ It contains:
 
 - the experiment source code (`src/btc_rl/`), prepared for publication;
 - the frozen configuration (`configs/foundation.toml`) and the locked list of software dependencies;
-- the tests that run without the restricted dataset (`tests/`);
+- the exact historical daily dataset used by the study (`data/raw/btc-usdt-daily-raw-v4.csv`), pinned and checked by SHA-256;
+- the complete test suite (`tests/`), including dataset-integrity checks;
 - a read-only dashboard that is currently disabled: it displays no results and rejects every package (`dashboard/`);
 - documentation of the method, the evidence rules, the limitations and the reproduction boundary (`docs/`);
+- the frozen aggregate, per-training-start, baseline and seed-dispersion reports for VALIDATION and TEST (`results/data/`);
 - the historical TEST and VALIDATION results, the simple reference strategies, and the outcomes of the three research questions, explained below.
 
 It does not contain:
 
-- the underlying machine-readable result files, reports or day-by-day series;
-- the market dataset, which is identified only by its SHA-256 checksum;
-- trained models, training logs or run records;
+- day-by-day agent trajectories or portfolio replay series;
+- trained models, checkpoints, training logs or full run records;
 - any evidence package;
 - a licence, citation metadata or a release.
 
@@ -148,7 +149,7 @@ For completeness, the VALIDATION summary is below. It covers **239 daily decisio
 | E4: extended observation O2 + reward R2 | +53.58% ± 30.87% | +1.219 ± 0.395 | 42.21% | 51.0 | 7.36% |
 | Buy once and hold throughout | +66.45% | +1.322 | 53.14% | 1 | 0.15% |
 
-These figures are transcribed from the completed written assignment and the frozen final TEST and VALIDATION tables. The underlying machine-readable result files and market dataset are not included in this repository.
+These figures come from the included frozen VALIDATION and TEST reports. The human-readable [VALIDATION report](results/data/validation/final5_validation_results.md) and [TEST report](results/data/test/final_test_results.md) are accompanied by the corresponding machine-readable CSV files in the same directories.
 
 #### What each agent actually did
 
@@ -253,7 +254,7 @@ The effect of reward R2 changed with the observation and the evaluation period. 
 
 **Practical conclusion:** In this controlled historical study, the richer observation was more useful than the minimal one, especially because it reduced trading and modelled cost exposure. The evidence does **not** establish a reliable profitable daily investment strategy, performance in other markets or periods, or a statistically significant advantage.
 
-The readable results above are in this README. The machine-readable evidence files, market dataset and day-by-day replay are not included in this repository. The dashboard is currently disabled and displays no results.
+The readable results above, the exact market dataset and the aggregate and per-training-start machine-readable reports are in this repository. Day-by-day agent replay, trained models, checkpoints and training logs are not included. The dashboard is currently disabled and displays no results.
 
 For all nine static graphs and their plain-language interpretations, see the [illustrated results guide](results/README.md). It also states what the charts cannot establish.
 
@@ -271,12 +272,28 @@ See [`docs/limitations.md`](docs/limitations.md).
 
 ## Setup
 
+Install [uv](https://docs.astral.sh/uv/), clone this repository, and run these commands from its root directory:
+
 ```bash
-uv sync --frozen            # locked closure; CPU-only PyTorch wheels
-uv run pytest -q            # tests that need the dataset skip; nothing trains
+uv sync --frozen --extra dev  # locked closure, test runner and CPU-only PyTorch wheels
+uv run pytest -q              # complete tests, including dataset-integrity checks; nothing trains
+uv run python -m btc_rl.baselines --split validation --no-replay
 ```
 
-The raw dataset is not distributed (`docs/reproduction-boundary.md`). Loading code refuses any file whose identity differs from the pinned SHA-256, first date, last date and row count in `configs/foundation.toml`. The environment variable `BTC_RL_RAW_CSV` may point to a locally restored copy.
+The included file `data/raw/btc-usdt-daily-raw-v4.csv` is the exact input expected by the code. Every load verifies its SHA-256, first date, last retained date and row count against `configs/foundation.toml`. The loader refuses a changed or incomplete file. `BTC_RL_RAW_CSV` may point to another byte-identical copy when required.
+
+### Run a short PPO integration check
+
+Each command below trains one new agent for 16,384 learning steps, evaluates it on VALIDATION and writes its new outputs under `artifacts/`. The published checkout intentionally omits the earlier private replay input used by the original certification gate, so public reruns first use the complete test suite above and then pass `--skip-preflight` to the training command.
+
+```bash
+uv run python -m btc_rl.ppo_e1 --seed 42 --smoke --skip-preflight
+uv run python -m btc_rl.ppo_e2 --seed 42 --smoke --skip-preflight
+uv run python -m btc_rl.ppo_e3 --seed 42 --smoke --skip-preflight
+uv run python -m btc_rl.ppo_e4 --seed 42 --smoke --skip-preflight
+```
+
+Remove `--smoke` to use the study's full 200,000-step training budget. The original design used seeds `42`, `123`, `2026`, `31415` and `271828` for every experiment. New training is computationally expensive and may not reproduce the exact historical numbers because PPO training can vary across software and hardware environments. It creates new outputs; it does not alter the frozen historical findings reported above. See [`docs/reproduction-boundary.md`](docs/reproduction-boundary.md).
 
 ## Dashboard
 

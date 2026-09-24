@@ -1,0 +1,4 @@
+# Preserve the byte identity of the reproducibility dataset and frozen result tables.
+/data/raw/btc-usdt-daily-raw-v4.csv -text
+/results/data/validation/*.csv -text
+/results/data/test/*.csv -text
