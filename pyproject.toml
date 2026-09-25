@@ -1,7 +1,8 @@
 [project]
 name = "btc-usdt-rl-trading"
-version = "0.1.0"
+version = "1.0.0"
 description = "deterministic data/accounting foundation for the BTC/USDT RL research study (research use only)."
+license = { file = "LICENSE-CODE" }
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "gymnasium>=1.0",

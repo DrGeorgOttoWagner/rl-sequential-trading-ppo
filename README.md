@@ -116,8 +116,7 @@ It does not contain:
 
 - day-by-day agent trajectories or portfolio replay series;
 - trained models, checkpoints, training logs or full run records;
-- any evidence package;
-- a licence, citation metadata or a release.
+- any dashboard evidence package.
 
 ### What the final historical test showed
 
@@ -281,6 +280,13 @@ For all nine static graphs and their plain-language interpretations, see the [il
 - **Different periods.** VALIDATION and TEST differ in length and in market conditions.
 
 See [`docs/limitations.md`](docs/limitations.md).
+
+## License, dataset and citation
+
+- Source code, tests, configuration and dashboard implementation are licensed under the [MIT License](LICENSE-CODE).
+- Original documentation, result explanations and figures are licensed under [CC BY 4.0](LICENSE-DOCUMENTATION.md).
+- The exact BTC/USDT CSV remains included for reproducibility. It is third-party Binance market data and is not covered by the repository's MIT or CC BY 4.0 grants; see the [dataset provenance and rights note](data/raw/README.md).
+- Citation metadata are provided in [`CITATION.cff`](CITATION.cff).
 
 ## Setup
 

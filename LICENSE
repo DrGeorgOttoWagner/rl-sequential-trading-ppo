@@ -1,0 +1,17 @@
+# Licensing
+
+This repository uses a mixed licensing model so that the source code, research presentation and third-party market data are not conflated.
+
+## Source code — MIT License
+
+The source code, tests, configuration and dashboard implementation are licensed under the MIT License. The complete terms are in [`LICENSE-CODE`](LICENSE-CODE).
+
+## Documentation and original research presentation — CC BY 4.0
+
+The original documentation, result explanations and figures are licensed under the Creative Commons Attribution 4.0 International License. Scope and attribution details are in [`LICENSE-DOCUMENTATION.md`](LICENSE-DOCUMENTATION.md).
+
+## Included market dataset
+
+The file `data/raw/btc-usdt-daily-raw-v4.csv` remains included for exact research reproducibility. It contains historical BTC/USDT market data obtained from Binance and is **not** covered by the MIT or CC BY 4.0 grants above. The repository author claims no ownership of the underlying third-party market data. Provenance, identity and reuse notes are in [`data/raw/README.md`](data/raw/README.md).
+
+Nothing in this repository constitutes financial advice.

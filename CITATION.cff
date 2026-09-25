@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software or its reported research evidence, please cite it using this metadata."
+title: "Reinforcement Learning for Sequential Trading Decisions: A Controlled PPO Study on State Representation and Reward Design"
+type: software
+authors:
+  - family-names: Wagner
+    given-names: Georg-Otto
+version: 1.0.0
+date-released: 2026-09-25
+repository-code: "https://github.com/DrGeorgOttoWagner/rl-sequential-trading-ppo"
+url: "https://github.com/DrGeorgOttoWagner/rl-sequential-trading-ppo"
+keywords:
+  - reinforcement learning
+  - proximal policy optimization
+  - sequential trading
+  - reproducibility
+  - BTC/USDT

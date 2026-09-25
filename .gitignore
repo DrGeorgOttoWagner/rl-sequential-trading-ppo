@@ -11,4 +11,5 @@ data/*
 !data/raw/
 data/raw/*
 !data/raw/btc-usdt-daily-raw-v4.csv
+!data/raw/README.md
 artifacts/
