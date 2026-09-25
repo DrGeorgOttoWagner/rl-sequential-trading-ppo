@@ -17,6 +17,12 @@ These limitations apply to every statement about the study and are shown on the 
 13. Any reward × observation interaction is exploratory; no interaction hypothesis was pre-specified.
 14. VALIDATION and TEST differ in horizon and market regime; levels are not comparable across splits without that qualification.
 15. Descriptive evidence on one frozen period is neither generalization nor guaranteed profitability.
+16. PPO is the only learning algorithm tested; the study does not compare PPO with DQN, A2C or another RL method.
+17. The reference strategies are CASH, buy-and-hold and random actions. No simple active rule, such as a moving-average strategy, is included.
+18. O2 changes both the form of the information and the history it summarizes, so the study cannot separate the effect of representation from the effect of the longer horizon.
+19. The assignment's main tables do not report complete equity curves or time in CASH versus INVESTED, and policy probabilities and critic estimates were not retained.
+20. The fixed cost model omits changing liquidity and market impact; actual execution costs can be higher in stressed conditions, especially for high-turnover policies.
+21. Stronger evidence would require other assets, later evaluation windows, alternative algorithms, stronger active baselines and a newly protected TEST period.
 
 ## Statements this study does not make
 

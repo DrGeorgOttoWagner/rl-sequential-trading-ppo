@@ -1,6 +1,6 @@
 # Reinforcement Learning for Sequential Trading Decisions: A Controlled PPO Study on State Representation and Reward Design
 
-**A completed historical study, explained in plain language.** This repository contains the experiment code, the exact historical dataset used by the code, a summary of what happened in the final historical test, and the aggregate and per-training-start numerical reports behind the published tables. It does not contain trained models, training logs or day-by-day agent replay files.
+**A completed historical study, explained in plain language.** This repository contains the experiment code, the exact historical dataset used by the code, a summary of what happened in the final historical test, and the aggregate and per-training-start numerical reports behind the reported tables. It does not contain trained models, training logs or day-by-day agent replay files.
 
 **Start here:** Read sections 1–6 for the question and method, section 7 for the actual results, and the [illustrated results guide](results/README.md) for all nine charts with explanations. The underlying VALIDATION and TEST summary reports are available under [`results/data/`](results/data/). The figures and tables are readable on GitHub; the disabled dashboard and the private study website are not needed to understand the findings.
 
@@ -8,11 +8,17 @@ This is a research project, not financial advice and not a live trading system. 
 
 ## 1. The question
 
-Can a computer program learn, from historical prices alone, when it is better to hold an asset and when it is better to stay out of it? And if it can, what matters more for the outcome: **the information the program is given**, or **the way its behaviour is scored while it learns**?
+Can a computer program learn, from causal price-derived information and its current portfolio state, when it is better to hold an asset and when it is better to stay out of it? And if it can, what matters more for the outcome: **the information the program is given**, or **the way its behaviour is scored while it learns**?
 
 The study answers this with a small, tightly controlled experiment. It uses reinforcement learning, a branch of machine learning in which a program, called the **agent**, learns by trial and error. The agent acts, sees what happens, receives a score, and gradually adjusts its behaviour to collect a higher score.
 
-The asset is Bitcoin priced in the US-dollar stablecoin Tether (the BTC/USDT pair). The data are historical daily price records from the spot market.
+The asset is Bitcoin priced in the US-dollar stablecoin Tether (the BTC/USDT pair). The study uses historical daily BTC/USDT OHLCV records obtained from Binance; timestamps are expressed in UTC.
+
+The written assignment asks three formal research questions:
+
+- **RQ1:** Can PPO learn useful daily policies, assessed against CASH, buy-and-hold and random baselines using return, Sharpe ratio, maximum drawdown and trading activity?
+- **RQ2:** Does the longer-horizon engineered observation O2 improve return, risk and trading activity relative to the ten-return observation O1?
+- **RQ3:** Do the additional turnover and drawdown-increase penalties in reward R2 reduce trading and drawdown, or otherwise improve stability, relative to reward R1?
 
 ## 2. One decision per day: CASH or INVESTED
 
@@ -31,7 +37,7 @@ Only a **change** of state is a trade. Moving from CASH to INVESTED is a purchas
 
 The **observation** is the set of numbers handed to the agent before each decision. It is everything the agent knows about the world. The study compares two versions.
 
-- **Main observation O1** is deliberately plain. It contains the daily price changes of the last 10 days, plus the agent's current state (CASH or INVESTED).
+- **Main observation O1** is deliberately plain. It contains the 10 most recent daily log returns, each scaled using a standard deviation fitted on TRAIN only, plus the agent's current state (CASH or INVESTED).
 - **Extended observation O2** is a summary of the kind a human chart reader might prepare. It contains eight indicators computed from daily closing prices, plus the agent's current state: price changes over 1, 7 and 30 days; two measures of price fluctuation over 14 and 30 days; comparisons with the 50-day and 200-day average closing prices; and the 14-day relative strength index (RSI), which summarizes recent gains versus losses. The longest lookback is 200 days.
 
 O2 is a different view, not O1 with extras. The two share the most recent daily price change and the current state. O2 does not contain the other nine individual daily changes that O1 shows. It replaces them with summaries over longer periods.
@@ -65,11 +71,11 @@ Two observations and two rewards give four experiments. Everything else is ident
 | **Main observation O1** (last 10 daily price changes) | Experiment E1, the reference case | Experiment E3 |
 | **Extended observation O2** (eight indicators) | Experiment E2 | Experiment E4 |
 
-Only one ingredient changes between neighbouring cells. These paired comparisons examine the effect of changing one ingredient, while retaining the limitations of five training seeds on one shared market history:
+Only one ingredient changes between neighbouring cells. The formal questions map to the experiment as follows, while retaining the limitations of five training seeds on one shared market history:
 
-- **Does the observation matter?** Compare E2 with E1, and E4 with E3.
-- **Does the reward matter?** Compare E3 with E1, and E4 with E2.
-- **Can the agent learn a risk-aware policy at all?** Compare E4 with simple reference strategies that do not learn: always CASH, buy once and hold, and random decisions.
+- **RQ1:** assess all four learned configurations against CASH, buy-and-hold and random baselines; E4 is the prospectively designated main configuration.
+- **RQ2:** compare E2 with E1, and E4 with E3, holding reward and seed fixed.
+- **RQ3:** compare E3 with E1, and E4 with E2, holding observation and seed fixed.
 
 Learning starts from random initial settings, and a different start can lead to a different result. Each experiment was therefore trained five times with five fixed starting numbers, called **training seeds** (42, 123, 2026, 31415 and 271828). That gives 20 trained agents. All 20 see the same price history, so the five repetitions show how much the outcome depends on the random start. They are not five independent markets.
 
@@ -84,8 +90,8 @@ A program that is graded on the same data it learned from can look excellent and
 Three safeguards apply:
 
 1. **No look-ahead.** Every observation uses only prices that were already known on the decision day. Statistics used to scale the inputs come from TRAIN only. The last two dates of each period are used only to settle the final trade, so no period borrows prices from the next one.
-2. **TEST stayed untouched.** No choice of any kind was made with TEST data. The evaluation procedure was frozen and independently reviewed before TEST was opened.
-3. **TEST was used once.** All 20 trained agents were evaluated on TEST a single time. No policy was selected using TEST results, and no subsequent training, retuning or change to the frozen scientific evidence was permitted. The TEST evaluation is consumed; no second one is permitted.
+2. **TEST stayed untouched.** No design choice was made with TEST data. The evaluation procedure was frozen before TEST was opened.
+3. **TEST was used once.** All 20 trained agents were evaluated on TEST once, after development had ended. No policy or design choice was selected using TEST results. After the results were inspected, the same period could continue to document this historical study, but it could no longer serve as a new untouched hold-out for later model choices.
 
 An untouched TEST period is an evaluation safeguard. It is not proof that a model is free of overfitting, and it is not proof of future profitability: it describes one historical period.
 
@@ -133,6 +139,12 @@ The table below summarizes the frozen final assessment: 1,618 daily decision ste
 | E4: extended observation O2 + reward R2 | +107.30% ± 58.56% | +0.632 | 46.17% | 180.0 | 23.41% |
 | Buy once and hold throughout | +61.03% | +0.468 | 76.63% | 1 | 0.15% |
 
+#### A USD 10,000 scale example
+
+Applying the reported mean total returns to a hypothetical USD 10,000 starting portfolio gives approximate ending values of **USD 9,293 for E1, USD 15,630 for E2, USD 7,185 for E3, USD 20,730 for E4 and USD 16,103 for buy-and-hold**. For E4, the five individual hypothetical ending values ranged from approximately **USD 12,873 to USD 30,414**.
+
+This is only a scale conversion of the reported historical returns. These are marked portfolio values after the study's modelled costs—not cash earned by the author, annual returns, forecasts or live-trading results.
+
 **How to read this:** Total return is the change in portfolio value over the whole TEST period after the study’s modelled transaction costs; it is not an annual return. A positive return means the ending value exceeded the starting value. The Sharpe ratio compares return with the variability of daily returns, and higher is better within this comparison. “Largest fall” is the maximum drawdown expressed as a positive loss magnitude, so smaller is better. The fractional number of purchases or sales is an average over five whole-number counts, not a partial trade. “Cost drag” is the compounded cost factor implied by repeated purchases and sales at 0.10% fee plus 0.05% slippage allowance each; it is **not** fees divided by starting capital and it is not an additional cost to subtract from the reported returns.
 
 Both extended-observation designs ended above their starting value in **all five** training runs; the main-observation designs did so in only **two of five** runs for E1 and **one of five** for E3. E4 exceeded buy-and-hold return and Sharpe in **four of five** runs; E2 did so in **two of five**. Every O2 run had a smaller maximum drawdown than buy-and-hold, but the falls were still substantial. E4’s high mean was influenced by one run at +204.14%; its lowest run was +28.73%. The five runs share one market path, so these counts are descriptive, not a statistical test.
@@ -153,7 +165,7 @@ These figures come from the included frozen VALIDATION and TEST reports. The hum
 
 #### What each agent actually did
 
-The TEST return table alone does not show how often an agent changed its mind. Each purchase **or** sale is one transaction leg. More legs mean more applications of the modelled 0.10% fee plus 0.05% slippage allowance. The table gives averages over five training starts; the percentage of time invested is an average over the daily decisions. “Ended invested” counts whole agents, not a probability.
+The TEST return table alone does not show how often an agent changed its mind. Each purchase **or** sale is one transaction leg. More legs mean more applications of the modelled 0.10% fee plus 0.05% slippage allowance. The following repository-only aggregate diagnostics were not included in the assignment's main tables. The table gives averages over five training starts; the percentage of time invested is an average over the daily decisions. “Ended invested” counts whole agents, not a probability.
 
 | Experiment | Purchases or sales, mean ± seed SD | Modelled cost drag, mean ± seed SD | Time invested, mean ± seed SD | Ended INVESTED |
 | --- | ---: | ---: | ---: | ---: |
@@ -215,7 +227,7 @@ All 20 VALIDATION runs had positive total return, but the final TEST was positiv
 
 #### The three research questions, in numbers
 
-**Question 1 — Did a trained agent beat simple alternatives?** The counts below show how many of the five final TEST runs passed each comparison. A shallower largest fall means a smaller maximum drawdown than buy-and-hold. “All random” compares total return with each of the five random reference strategies.
+**RQ1 — Can PPO learn useful daily policies?** The counts below show how many of the five final TEST runs passed each comparison with CASH, buy-and-hold and random baselines. A shallower largest fall means a smaller maximum drawdown than buy-and-hold. “All random” compares total return with each of the five random reference strategies.
 
 | Experiment | Positive return | Higher return than buy-and-hold | Higher Sharpe than buy-and-hold | Shallower largest fall than buy-and-hold | Higher return than every random strategy |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -224,7 +236,7 @@ All 20 VALIDATION runs had positive total return, but the final TEST was positiv
 | E3: main observation O1 + reward R2 | 1/5 | 0/5 | 0/5 | 4/5 | 1/5 |
 | E4: extended observation O2 + reward R2 | 5/5 | 4/5 | 4/5 | 5/5 | 5/5 |
 
-**Question 2 — What changed when the agent received extended observation O2?** Each comparison pairs agents with the *same seed* and the same reward, changing only the observation. Each count is out of five pairs. The return difference is in **percentage points** of total return, not a percentage improvement over the first value.
+**RQ2 — Does the longer-horizon engineered observation O2 improve outcomes relative to O1?** Each comparison pairs agents with the *same seed* and the same reward, changing only the observation. Each count is out of five pairs. The return difference is in **percentage points** of total return, not a percentage improvement over the first value.
 
 | Period and comparison | Fewer trades | Lower cost drag | Higher return | Higher Sharpe | Shallower largest fall | Mean return difference |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -235,7 +247,7 @@ All 20 VALIDATION runs had positive total return, but the final TEST was positiv
 
 The most consistent observed change was **less trading and less modelled cost exposure** with extended observation O2. The return advantage was clear within the five paired runs on TEST, but not consistent on VALIDATION. The two periods differ greatly in length (239 versus 1,618 decisions), so their raw trade counts and cumulative returns must not be compared directly as if they measured the same interval.
 
-**Question 3 — What changed when reward R2 added trading and drawdown penalties?** Here the observation and seed are held fixed, while reward R1 changes to reward R2. The columns are again counts out of five pairs. A higher trade count is listed deliberately: despite its trading penalty, reward R2 did not reliably reduce actual trading.
+**RQ3 — Do R2's additional penalties reduce trading and drawdown or improve stability?** Here the observation and seed are held fixed, while reward R1 changes to reward R2. The columns are again counts out of five pairs. A higher trade count is listed deliberately: despite its trading penalty, reward R2 did not reliably reduce actual trading.
 
 | Period and comparison | More trades | Higher cost drag | Higher return | Higher Sharpe | Shallower largest fall | Mean return difference |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -252,7 +264,7 @@ The effect of reward R2 changed with the observation and the evaluation period. 
 - **The results varied between training runs.** Starting the same design with different random seeds produced materially different outcomes. The O2 agents showed meaningful behaviour on this historical TEST period, but also substantial drawdowns.
 - **The development period did not predict the final ranking.** By average historical return, the configuration ranked first on VALIDATION was ranked last on TEST, while the one ranked last on VALIDATION was ranked first on TEST. This is why the final period was kept untouched until the design was fixed; it does not prove a particular cause or eliminate overfitting.
 
-**Practical conclusion:** In this controlled historical study, the richer observation was more useful than the minimal one, especially because it reduced trading and modelled cost exposure. The evidence does **not** establish a reliable profitable daily investment strategy, performance in other markets or periods, or a statistically significant advantage.
+**Practical conclusion:** Within this controlled historical experiment, the longer-horizon engineered observation O2 affected the results more consistently than adding turnover and drawdown-increase penalties to the reward. O2 reduced trading and modelled cost exposure under both reward definitions, whereas R2 did not produce a consistent main effect. The evidence does **not** establish a generally profitable strategy, performance in other markets or periods, or a statistically significant advantage.
 
 The readable results above, the exact market dataset and the aggregate and per-training-start machine-readable reports are in this repository. Day-by-day agent replay, trained models, checkpoints and training logs are not included. The dashboard is currently disabled and displays no results.
 

@@ -4,8 +4,8 @@ This document describes the final frozen study design. Choices were frozen befor
 
 ## Data
 
-- One asset and one historical daily spot-market dataset: Bitcoin priced in the US-dollar stablecoin Tether (BTC/USDT). Each daily record holds the opening, highest, lowest and closing price and the traded volume (OHLCV). No exchange, product or asset is recommended.
-- The exact dataset is included at `data/raw/btc-usdt-daily-raw-v4.csv`. It is identified by its SHA-256 (`configs/foundation.toml`, `[dataset].expected_sha256`), first date 2017-08-17, last retained date 2026-04-29 and 3178 rows after the cutoff.
+- One asset and one historical daily spot-market dataset: Bitcoin priced in the US-dollar stablecoin Tether (BTC/USDT), obtained from Binance. Each daily record holds the opening, highest, lowest and closing price and the traded volume (OHLCV). Timestamps are expressed in UTC. No exchange, product or asset is recommended.
+- The exact dataset is included at `data/raw/btc-usdt-daily-raw-v4.csv`. The raw file contains 3,179 consecutive daily observations from 2017-08-17 through 2026-04-30, with no duplicate timestamps, missing daily intervals or blank fields. The predetermined cutoff retains 3,178 rows through 2026-04-29, so no missing-data imputation was required. The retained input is identified by its SHA-256 (`configs/foundation.toml`, `[dataset].expected_sha256`).
 - Hard cutoff by candle date (last usable candle 2026-04-29); no wall-clock logic; no fetching; no silent repair. Any integrity violation raises `DataIntegrityError`.
 - Timestamps must be exact UTC midnight with exact 24-hour spacing; the checks run on the raw millisecond epoch before any normalisation.
 
@@ -81,12 +81,12 @@ Observation history may reach back before the start of a split as warm-up (O2 ne
 A **reward** is the single number the agent receives after each decision; training adjusts the agent so that the sum of rewards grows.
 
 - **Reward R1**: portfolio log return per step after transaction costs.
-- **Reward R2**: R1 − 0.0005 · legs − 0.10 · max(0, D_{t+1} − D_t), where D is the **nonnegative drawdown magnitude** `D = 1 − equity / running_peak` (D ≥ 0; the running peak is the maximum realised equity so far, initial equity included). D is the negative of the signed drawdown metric `equity / running_peak − 1` defined above; the penalty applies only when the magnitude increases, so a new high, a recovery or an unchanged drawdown contributes 0. The implementation records describe these coefficients as fixed prospectively. The inspected accepted runs use these values unchanged, and the independent review found no coefficient search or tuning. The design reserved any coefficient selection to the validation stage; that rule does not establish that a tuning search was performed. No coefficient was selected using TEST. R2 changes only the training incentive; the financial accounting is identical in all four configurations.
+- **Reward R2**: R1 − 0.0005 · legs − 0.10 · max(0, D_{t+1} − D_t), where D is the **nonnegative drawdown magnitude** `D = 1 − equity / running_peak` (D ≥ 0; the running peak is the maximum realised equity so far, initial equity included). D is the negative of the signed drawdown metric `equity / running_peak − 1` defined above; the penalty applies only when the magnitude increases, so a new high, a recovery or an unchanged drawdown contributes 0. The implementation records describe these coefficients as fixed prospectively and do not document a data-driven coefficient-selection exercise. The design reserved any coefficient selection to the validation stage; that rule does not establish that a tuning search was performed. No coefficient was selected using TEST. R2 changes only the training incentive; the financial accounting is identical in all four configurations.
 
 ## Agent and experiment grid
 
-- PPO (Stable-Baselines3), small MLP policy, CPU.
-- E1 = O1 + R1 (control), E2 = O2 + R1 (RQ2 treatment), E3 = O1 + R2 (RQ3 treatment), E4 = O2 + R2 (RQ1 main configuration). Every configuration shares the dataset, splits, timeline, action space, cost model and PPO settings; only the observation and/or reward differ.
+- PPO (Stable-Baselines3) with separate actor and critic multilayer perceptrons of two 64-unit `tanh` hidden layers, trained on CPU. Fixed settings: learning rate `3e-4`, rollout length `2048`, batch size `64`, `10` epochs per update, discount factor `0.99`, GAE lambda `0.95`, clip range `0.2`, entropy coefficient `0`, value coefficient `0.5` and maximum gradient norm `0.5`. The requested budget was 200,000 steps; the rollout structure executed 200,704 steps.
+- E1 = O1 + R1 (control for RQ1, RQ2 and RQ3), E2 = O2 + R1 (RQ2 treatment), E3 = O1 + R2 (RQ3 treatment), E4 = O2 + R2 (prospectively designated RQ1 main configuration and the second RQ2/RQ3 contrast). Every configuration shares the dataset, splits, timeline, action space, cost model and PPO settings; only the observation and/or reward differ.
 - Training-seed cohort: 42, 123, 2026, 31415, 271828 (development subset 42, 123, 2026; the two further seeds were fixed prospectively before any additional training). Results are reported as mean and population standard deviation across seeds.
 
 ## Baselines
@@ -95,4 +95,4 @@ Always CASH, BUY_AND_HOLD (one entry leg, then held) and five seeded random poli
 
 ## Governance of the TEST window
 
-The evaluation harness was frozen and reviewed before the TEST window was opened; opening required an explicit, hash-bound human authorization naming the exact reviewed code identity. All twenty learned policies were evaluated once; no policy was selected using TEST results, and no subsequent training, retuning or change to the frozen scientific evidence was permitted. The learned-policy TEST evaluation occurred once and is consumed; no second evaluation is permitted. How the resulting evidence may enter this repository is described in `evidence-provenance.md`.
+All observation and reward definitions, PPO settings, seeds and split dates were fixed before the final TEST evaluation. The 20 trained policies were evaluated on TEST once, after development had ended. No policy or design choice was selected using TEST results. Once those results had been inspected, the same period could still document this historical study but could no longer serve as a new untouched hold-out for later model choices. How the resulting evidence is represented in this repository is described in `evidence-provenance.md`.

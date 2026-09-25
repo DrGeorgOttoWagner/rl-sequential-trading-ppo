@@ -13,7 +13,7 @@ The figures describe **one historical Bitcoin spot-market path**, not a live inv
 | Final TEST | 30 August 2021–4 February 2026: the 1,618-decision, one-time final assessment. |
 | E1 | Main observation O1 (last 10 daily price changes) with reward R1 (portfolio growth after costs). |
 | E2 | Extended observation O2 (eight price-derived indicators) with reward R1. |
-| E3 | Main observation O1 with reward R2 (R1 plus trading and drawdown penalties). |
+| E3 | Main observation O1 with reward R2 (R1 minus trading and drawdown-increase penalties). |
 | E4 | Extended observation O2 with reward R2. |
 | Training start or seed | One of five random initializations of the same design. The five agents use the same market path; they are not independent market samples. |
 | Buy and hold | Buy once and remain invested; a fixed reference, not a trained agent. |
@@ -24,7 +24,7 @@ All returns shown here are **total returns over the named period after the study
 
 ![Final TEST total return bars for the four learned agents, buy-and-hold, always CASH and five random strategies](figures/final-test-returns.svg)
 
-**How to read it.** A return of +107.30% for E4 means its mean final portfolio value was 2.073 times its starting value over the whole TEST period, *after* the modelled costs. It does not mean +107.30% per year. E4 had the highest mean among these examples, but the five E4 starts ranged from +28.73% to +204.14%. E1 and E3 had negative mean returns. Buy-and-hold gained +61.03%. The random strategies are deliberately simple reference points, not strategies being recommended.
+**How to read it.** A return of +107.30% for E4 means its mean final portfolio value was 2.073 times its starting value over the whole TEST period, *after* the modelled costs. For a hypothetical USD 10,000 starting portfolio, that is approximately USD 20,730; the five individual E4 ending values ranged from about USD 12,873 to USD 30,414. These are scale illustrations of marked historical portfolio values—not cash earned, annual returns, forecasts or live-trading results. E1 and E3 had negative mean returns. Buy-and-hold gained +61.03%. The random strategies are deliberately simple reference points, not strategies being recommended.
 
 ![Final TEST Sharpe ratio, largest portfolio fall and number of purchases or sales for each agent design and buy-and-hold](figures/final-test-risk-and-trading.svg)
 
@@ -72,6 +72,6 @@ The upper four rows change only the observation (O1 to O2); the lower four chang
 
 ## What a reader can and cannot conclude
 
-The completed historical study illustrates that the information supplied to a PPO agent mattered more consistently here than the modified reward: extended observation O2 was associated with fewer trades and less modelled cost exposure, and it outperformed O1 in the matched final TEST comparisons. The finding is limited to this design, five training starts and one historical market path. It is not evidence of a general, statistically established or future-profitable daily trading strategy. No live trading was performed.
+The completed historical study illustrates that the information supplied to a PPO agent mattered more consistently here than the modified reward: the longer-horizon engineered observation O2 was associated with fewer trades and less modelled cost exposure under both rewards, whereas R2 did not produce a consistent main effect. The finding is limited to this design, five training starts and one historical market path. It is not evidence of a general, statistically established or future-profitable daily trading strategy. No live trading was performed.
 
 For the study question, exact indicator definitions, fixed costs and evaluation safeguards, start with the [main README](../README.md). For technical details, see [methodology](../docs/methodology.md), [limitations](../docs/limitations.md) and [evidence provenance](../docs/evidence-provenance.md). The exact market dataset and the aggregate, per-training-start, baseline and seed-dispersion reports are included. Model weights, checkpoints, training logs and day-by-day agent replay remain outside this repository, so the completed historical agents cannot be reconstructed byte for byte from this repository alone.

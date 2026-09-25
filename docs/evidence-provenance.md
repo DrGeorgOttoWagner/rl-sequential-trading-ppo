@@ -1,34 +1,23 @@
 # Evidence provenance
 
-This repository separates **code** from **evidence**.
+This repository separates the **reported historical evidence** from outputs created by later reruns.
 
-- **Code** is what this repository ships: sanitized source, configuration, locked dependencies, tests, dashboard and documentation. Public source files are derivative copies; the frozen evidence of the study is bound to the private byte identities of the original files, so the public code documents the method but cannot re-certify the evidence.
-- **Evidence** is the set of frozen result tables, the TEST report and their derived dashboard payloads. Evidence enters this repository only as an **evidence package** produced by a deterministic producer under the Research Evidence Contract, validated independently and reviewed before any release. **No evidence package is installed in this candidate.**
+## Included historical evidence
 
-## What an evidence package will contain
+- The exact raw daily BTC/USDT input used by the study is included at `data/raw/btc-usdt-daily-raw-v4.csv` and is pinned by SHA-256 in `configs/foundation.toml`.
+- Frozen human-readable and machine-readable VALIDATION reports are included under `results/data/validation/`.
+- Frozen human-readable and machine-readable TEST reports are included under `results/data/test/`.
+- The static figures under `results/figures/` are explanatory derivatives of the included numerical reports. They do not introduce new experiments or metrics.
+- The main `README.md` and `results/README.md` restate the reported results in plain language and link to the underlying reports.
 
-| Location | Content | Kind |
-|---|---|---|
-| `results/test/`, `results/validation/` | byte-identical copies of the frozen result tables and the TEST report, each with its SHA-256 in the package manifest | immutable evidence |
-| `dashboard/data/` | the dashboard entry point (`provenance.json`) and the derived, canonical JSON payloads the dashboard renders | deterministic derivatives |
-| `provenance/` | the package manifest, design identity, withheld-artifact index, software identity (including the private → public source hash map) and the claims-and-limitations payload | deterministic derivatives |
-| `figures/` | an index that is empty in contract version 1 | deterministic derivative |
+The historical reports identify their source CSV files. The main README gives the aggregate results, per-seed returns, baseline results and the descriptive RQ1–RQ3 comparisons used in the written assignment.
 
-Every payload lists its sources and hashes. Derivatives restate frozen values exactly and introduce no new metric. Content whose publication decision is unresolved or negative is **withheld**: it has no file, its descriptor carries null physical fields, and it never reappears in another format.
+## Not included
 
-## Identities a package carries
+The repository does not distribute the original trained model checkpoints, training logs, full run metadata, per-step portfolio series, policy probabilities, critic estimates or day-by-day replay payloads. Consequently, the original trained agents cannot be reconstructed byte for byte from this repository alone.
 
-- `evidence_set_id`: the hash of the historical baseline manifest, the dataset hash and the TEST execution commit.
-- `content_gate_profile_id`: the hash of the owner's two content decisions (derived data; per-seed data).
-- `dashboard_set_id`: the hash of the dashboard subset's descriptor projections, recomputed by the dashboard before rendering.
-- `package_candidate_id`: the hash of the manifest identity object; it names the whole package.
-
-None of these proves that a package was reviewed, approved or released. Validation attestations, review records and release authorizations are external records.
-
-## Withheld and blocked material
-
-Model checkpoints, per-step series, replay payloads, the raw dataset, run metadata, harness records, training logs and private documents are never distributed. A package names them only by logical identifier, SHA-256 and size. Per-step series and replay payloads are additionally **blocked** in contract version 1: they have no public location or schema whatever the content decisions say.
+The read-only dashboard remains deliberately disabled. No dashboard evidence package or approved binding is installed, so the dashboard displays no scientific result. The included reports and static figures are the public-readable evidence surface.
 
 ## Outputs of running this code
 
-Any output written by a later execution of this public code is a **new output**. It is never placed at a package location, never listed in a package manifest and never presented as frozen evidence. Two persisted metadata strings of such a run (the run-scope label and the prose rationale of the observation scale) intentionally carry public wording and therefore differ from the frozen private metadata.
+Any model, report or other artifact created by a later execution of this repository is a **new output**. A new run can reproduce the method, but it is not one of the original frozen agents and must not be presented as the historical evidence reported in the assignment. Because the original TEST results have already been inspected, the same calendar window cannot serve as a new untouched hold-out for later model choices.

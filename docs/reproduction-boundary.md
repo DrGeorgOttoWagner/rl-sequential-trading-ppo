@@ -18,14 +18,14 @@ What can and cannot be reproduced from this repository alone.
 ## Requires withheld private artifacts
 
 - The original checkpoints, run metadata, detailed curves and closure records are not distributed. E1–E4 can train new models from the included data, but the original cohort and final TEST harnesses remain bound to the withheld original artifacts. A new training output is not the frozen historical evidence.
-- The one-time TEST harness binds four withheld authority records by neutral relative names — `authority/cohort-corrections.md`, `authority/validation-freeze.md`, `authority/cohort-review.md` and `authority/cohort-closure-review.md` — each pinned by SHA-256. These records are not distributed. The harness therefore fails closed on a checkout of this repository and is not executable or reproducible end to end from it; no other file can satisfy the pinned digests.
+- The original final-cohort and TEST harnesses depend on withheld study records. They therefore fail closed on a checkout of this repository and cannot recreate the original evaluation end to end.
 - Run metadata written by this code carries the key `study_stage` with neutral stage labels (`ppo-e1` … `ppo-e4`, `final-cohort`, `final-test`). Frozen private records are not rewritten. The final-cohort sidecar reader requires `study_stage` and rejects a sidecar missing that field or carrying a different stage. These metadata changes do not establish general compatibility with historical private records. Anything written by this code is a new output, never frozen evidence.
 - Model checkpoints are not distributed; nothing in this repository loads a model. `load_e1_model` and its aliases remain in the code for completeness only.
 
 ## Unavailable functionality
 
 - The replay baseline (`policies.make_variant_a_replay`, `load_v5b_positions`, `v5b_artifact_path`) reads a position series from the author's earlier supervised-learning study. That file is not part of this repository. Inside this boundary `run_baselines` must be called with `include_replay=False`; replay-dependent baseline execution is not available and is not presented as available.
-- The one-time TEST evaluation cannot recur: the TEST window is consumed.
+- The original TEST results have already been inspected. The same calendar window may still be used to document or check this historical study, but it cannot serve as a new untouched hold-out for later model choices.
 
 ## What reproduction would establish
 

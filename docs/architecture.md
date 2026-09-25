@@ -9,11 +9,13 @@ ppo-sequential-trading-study/
   data/raw/                    exact frozen historical dataset used by the study
   src/btc_rl/                  experiment source (see module map)
   tests/                       complete synthetic and real-data integrity tests
-  dashboard/                   read-only evidence dashboard (index.html, css/, js/); data/ is empty until a package is installed
+  dashboard/                   read-only evidence dashboard (index.html, css/, js/); disabled without an approved package
   docs/                        methodology, evidence provenance, limitations, reproduction boundary, dashboard, architecture
+  results/data/                included frozen VALIDATION and TEST reports and CSV tables
+  results/figures/             static explanatory figures derived from the included reports
 ```
 
-Absent by design: `artifacts/` (original checkpoints, curves and logs withheld), `provenance/` and `dashboard/data/` (created only by an evidence package). `results/` contains static explanatory figures; `data/raw/` contains the exact study input.
+Absent by design: `artifacts/` (original checkpoints, curves and logs withheld), `provenance/` and `dashboard/data/` (created only by an evidence package). `results/` contains the frozen numerical reports and static explanatory figures; `data/raw/` contains the exact study input.
 
 ## Module map (`src/btc_rl/`)
 
@@ -37,7 +39,7 @@ Absent by design: `artifacts/` (original checkpoints, curves and logs withheld),
 | `ppo_e1.py` … `ppo_e4.py` | experiment runners: PPO hyperparameters, split enforcement, metadata | yes for new runs; use the README public-rerun procedure |
 | `ppo_e1_report.py` … `ppo_e4_report.py` | VALIDATION report builders | no: private artifacts |
 | `final_cohort.py`, `final_cohort_report.py` | five-seed cohort harness and reports | no: private artifacts |
-| `final_test.py`, `final_test_report.py` | human-gated one-time TEST harness and report builder | no: private artifacts; TEST is consumed |
+| `final_test.py`, `final_test_report.py` | human-gated original TEST harness and report builder | no: required original private artifacts are withheld |
 
 Every command-line module is guarded by `if __name__ == "__main__":`; importing a module executes no training, evaluation, file write or network access.
 
@@ -51,14 +53,15 @@ Every command-line module is guarded by `if __name__ == "__main__":`; importing 
 | `uv run python -m btc_rl.ppo_e1 --seed 42 --smoke --skip-preflight` and the other runners | included dataset; outputs are new outputs, not frozen evidence |
 | `cd dashboard && python -m http.server 8080` | none; shows *No evidence package installed* |
 
-## Evidence flow
+## Public evidence flow
 
 ```
-private laboratory ──(deterministic producer, independent validation, review, owner decisions)──▶ evidence package
-                                                                                                    │
-                                        results/  provenance/  figures/  dashboard/data/  ◀────────┘
-                                                                              │
-                                                              dashboard verifies, then renders
+frozen numerical reports ──▶ results/data/
+            │
+            ├──────────────▶ README result tables and explanations
+            └──────────────▶ results/figures/ static explanatory charts
+
+dashboard/data/ remains empty ──▶ dashboard displays no scientific result
 ```
 
-The code in this repository never produces, edits or certifies an evidence package.
+New executions write new artifacts. They do not replace or re-certify the included historical reports.
